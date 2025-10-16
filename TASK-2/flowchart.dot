@@ -1,0 +1,88 @@
+digraph AlisverisSepetiAlgoritmasi {
+    // Grafiğin genel yönünü yukarıdan aşağıya (Top-Down) ayarlayın
+    rankdir=TB;
+    
+    // Düğüm şekillerini tanımlayın
+    // Başlangıç/Bitiş
+    node [shape=box, style="filled", fillcolor="lightblue"]; 
+    start [label="BAŞLANGIÇ: Sepet Başlat"];
+    finish [label="BİTİŞ"];
+
+    // İşlem Adımları
+    node [shape=box, style="filled", fillcolor="palegreen"]; 
+    Görüntüle [label="Sepeti Görüntüle"];
+    Hesapla [label="Sepet Toplam Tutarını Hesapla"];
+    
+    // Karar Noktaları (Elmas şekli)
+    node [shape=diamond, style="filled", fillcolor="yellow"];
+    stok_kontrol [label="Yeni Miktar >\nÜrün Stok?"];
+    urun_var_mi [label="Ürün Sepette Var Mı?"];
+    miktar_buyuk_mu [label="Çıkarılacak Miktar \u2265\nSepetteki Miktar?"];
+
+    // G/Ç (Giriş/Çıkış veya Veritabanı İşlemi - Paralelkenar)
+    node [shape=parallelogram, style="filled", fillcolor="orange"];
+    Urun_Ekle_Giris [label="Giriş: Ürün ID, Miktar"];
+    Urun_Cikar_Giris [label="Giriş: Ürün ID, Miktar"];
+    DB_Kontrol [label="Ürün Bilgisini (Stok, Fiyat) \nVeritabanından Getir"];
+    
+    // Sepet Güncelleme (Silindir/Veritabanı Sembolü kullanılabilir ancak burada basit bir kutu kullanalım)
+    node [shape=box, style="filled", fillcolor="lightcoral"];
+    Sepet_Guncelle [label="SEPET[ID] = Yeni Miktar"];
+    Sepet_Sil [label="SEPET'ten Ürünü Sil"];
+
+    
+    // ----------------------------------------------------
+    // ÜRÜN EKLE AKIŞI
+    // ----------------------------------------------------
+    subgraph cluster_ekle {
+        label = "PROSEDÜR: Ürün_Ekle";
+        style = "dashed";
+        
+        start -> Urun_Ekle_Giris;
+        Urun_Ekle_Giris -> DB_Kontrol;
+        DB_Kontrol -> stok_kontrol [label="Ürün Bulundu"];
+        
+        stok_kontrol -> Sepet_Guncelle [label="HAYIR (Stok Yeterli)"];
+        stok_kontrol -> Hata_Stok [label="EVET (Stok Aşımı)"];
+
+        node [shape=box, style="filled", fillcolor="red"]; 
+        Hata_Stok [label="Hata: Yetersiz Stok"];
+        
+        Sepet_Guncelle -> Görüntüle;
+        Hata_Stok -> finish;
+    }
+    
+    // ----------------------------------------------------
+    // ÜRÜN ÇIKAR AKIŞI
+    // ----------------------------------------------------
+    subgraph cluster_cikar {
+        label = "PROSEDÜR: Ürün_Çıkar";
+        style = "dashed";
+        
+        Görüntüle -> Urun_Cikar_Giris;
+        Urun_Cikar_Giris -> urun_var_mi;
+
+        urun_var_mi -> miktar_buyuk_mu [label="EVET"];
+        
+        node [shape=box, style="filled", fillcolor="red"]; 
+        Hata_Sepette_Yok [label="Hata: Ürün Sepette Yok"];
+        
+        urun_var_mi -> Hata_Sepette_Yok [label="HAYIR"];
+
+        miktar_buyuk_mu -> Sepet_Sil [label="EVET"];
+        miktar_buyuk_mu -> Sepet_Guncelle_Cikar [label="HAYIR"];
+        
+        node [shape=box, style="filled", fillcolor="lightcoral"];
+        Sepet_Guncelle_Cikar [label="SEPET[ID] = Miktar Azalt"];
+
+        Sepet_Sil -> Hesapla;
+        Sepet_Guncelle_Cikar -> Hesapla;
+        Hata_Sepette_Yok -> Hesapla;
+    }
+    
+    // ----------------------------------------------------
+    // TOPLAM TUTAR HESAPLAMA AKIŞI
+    // ----------------------------------------------------
+    Hesapla -> finish;
+    
+}
