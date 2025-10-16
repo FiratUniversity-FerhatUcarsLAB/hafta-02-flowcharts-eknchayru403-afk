@@ -1,0 +1,107 @@
+digraph ATM_ParaCekme {
+    // Grafiğin genel ayarları
+    rankdir=TB;  // Yönlendirme: Yukarıdan Aşağıya (Top to Bottom)
+    graph [
+        fontname = "Helvetica",
+        label = "ATM Para Çekme Sistemi Akış Şeması",
+        labelloc = t,
+        bgcolor = "#f7f7f7"
+    ];
+    node [
+        fontname = "Helvetica",
+        fontsize = 10,
+        style = "filled",
+        fillcolor = "#ffffff"
+    ];
+    edge [fontname = "Helvetica"];
+
+    // 1. Düğümlerin Tanımlanması (Akış Şeması Şekilleri)
+    
+    // Başlangıç/Bitiş (Oval)
+    basla [shape=oval, label="BAŞLANGIÇ", fillcolor="#a8e6cf"];
+    bitir [shape=oval, label="BİTİR", fillcolor="#ff8c94"];
+    
+    // İşlem/Süreç (Dikdörtgen)
+    kart_gir [shape=box, label="1. Kart Takılır"];
+    pin_al [shape=box, label="2. PIN Kodu Girilir"];
+    bakiye_al [shape=box, label="3. Bakiye Bilgisi Alınır"];
+    secim_al [shape=box, label="4. İşlem Seçimi Alınır (Para Çekme?)"];
+    miktar_gir [shape=box, label="5. Çekilecek Miktar Girilir"];
+    nakit_ver [shape=box, label="6. ATM'den Nakit Verilir"];
+    fiş_bas [shape=box, label="7. Fiş Basılır (İstenirse)"];
+    kart_çıkar [shape=box, label="8. Kart Çıkarılır"];
+    bloke [shape=box, label="Kart Bloke Edilir", fillcolor="#f9c8d5"];
+    
+    // Karar (Eşkenar Dörtgen/Elmas)
+    kart_okundu [shape=diamond, label="Kart Okundu ve\nGeçerli mi?"];
+    pin_dogru [shape=diamond, label="PIN\nDoğru mu?"];
+    hak_kaldi [shape=diamond, label="Hak Kaldı mı?"];
+    islem_para_cekme [shape=diamond, label="Seçim\nPara Çekme mi?"];
+    miktar_g [shape=diamond, label="Miktar\nGeçerli mi?"];
+    bakiye_yeter [shape=diamond, label="Bakiye\nYeterli mi?"];
+    nakit_var [shape=diamond, label="ATM'de Yeterli\nNakit Var mı?"];
+    banka_onay [shape=diamond, label="Banka Sistemi\nOnayladı mı?"];
+    
+    // Hata/Uyarı Çıkışları
+    hata_okuma [shape=box, label="HATA: Kart Okunamadı", fillcolor="#ffaaa5"];
+    hata_pin [shape=box, label="HATA: Kart Bloke", fillcolor="#ffaaa5"];
+    hata_yetersiz_bakiye [shape=box, label="HATA: Yetersiz Bakiye", fillcolor="#ffaaa5"];
+    hata_atm_nakit [shape=box, label="HATA: ATM'de Nakit Yok", fillcolor="#ffaaa5"];
+    hata_banka [shape=box, label="HATA: Banka Sistem Hatası", fillcolor="#ffaaa5"];
+    iptal_et [shape=box, label="İşlem İptal Edildi", fillcolor="#fff5ba"];
+
+    // 2. Akışın Tanımlanması (Yönlendirilmiş Bağlantılar)
+    
+    // Başlangıç
+    basla -> kart_gir;
+    kart_gir -> kart_okundu;
+
+    // Kart Kontrolü
+    kart_okundu -> pin_al [label="Evet"];
+    kart_okundu -> hata_okuma [label="Hayır"];
+    hata_okuma -> kart_çıkar;
+    
+    // PIN Doğrulama Döngüsü
+    pin_al -> pin_dogru;
+    pin_dogru -> bakiye_al [label="Evet"];
+    pin_dogru -> hak_kaldi [label="Hayır"];
+    
+    hak_kaldi -> pin_al [label="Evet\n(PIN Hakkı > 0)"];
+    hak_kaldi -> bloke [label="Hayır\n(Hakkı Bitti)"];
+    bloke -> hata_pin;
+    hata_pin -> kart_çıkar;
+
+    // İşlem Seçimi
+    bakiye_al -> secim_al;
+    secim_al -> islem_para_cekme;
+    islem_para_cekme -> miktar_gir [label="Evet"];
+    islem_para_cekme -> iptal_et [label="Hayır\n(Diğer İşlem/İptal)"];
+    iptal_et -> kart_çıkar;
+
+    // Miktar Girişi ve Kontrolü
+    miktar_gir -> miktar_g;
+    miktar_g -> bakiye_yeter [label="Evet"];
+    miktar_g -> miktar_gir [label="Hayır\n(Geçersiz Miktar)"];
+
+    // Bakiye Kontrolü
+    bakiye_yeter -> nakit_var [label="Evet\n(Bakiye Yeterli)"];
+    bakiye_yeter -> hata_yetersiz_bakiye [label="Hayır"];
+    hata_yetersiz_bakiye -> kart_çıkar;
+
+    // ATM Nakit Kontrolü
+    nakit_var -> banka_onay [label="Evet"];
+    nakit_var -> hata_atm_nakit [label="Hayır"];
+    hata_atm_nakit -> kart_çıkar;
+
+    // Banka İşlemi Onayı
+    banka_onay -> nakit_ver [label="Başarılı"];
+    banka_onay -> hata_banka [label="Hata"];
+    hata_banka -> kart_çıkar;
+    
+    // Para Verme ve Bitirme Aşaması
+    nakit_ver -> fiş_bas;
+    fiş_bas -> kart_çıkar;
+    
+    // Bitiş Bağlantıları
+    kart_çıkar -> bitir;
+}
