@@ -1,7 +1,3 @@
 Hayrunnisa Ekinci
 240541043
-[pseudocode.md](https://github.com/user-attachments/files/22940700/pseudocode.md)
-[flowchart.dot.txt](https://github.com/user-attachments/files/22940794/flowchart.dot.txt)
-<img width="2960" height="648" alt="flowchart" src="https://github.com/user-attachments/assets/259ea449-b360-44d8-b224-149a9b5b185f" />
-[llm.conversations.txt](https://github.com/user-attachments/files/22941355/llm.conversations.txt)
-[README.md.txt](https://github.com/user-attachments/files/22940825/README.md.txt)
+"Akıllı ev güvenlik sistemi için ilk başta temel bir pseudocode (sözde kod) oluşturdum. Bu kod, sistemin farklı durumlarını (EVDE, UZAKTA, ALARM) ve geçiş mantığını içeriyordu. Ardından, bu algoritmanın akışını görselleştirmek için bir DOT (Graphviz) kodu yazdım. DOT kodunda 48. satırla ilgili bir geri bildirim aldım ve koddaki sürekli döngü mantığını daha net gösterecek şekilde o kısmı düzelttim. Yani, bir algoritma fikriyle başlayıp, görsel bir akış şemasıyla tamamladım."
