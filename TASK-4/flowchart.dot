@@ -1,0 +1,54 @@
+digraph DersKayitAkisSemasi {
+    // Grafik Ayarları
+    rankdir=TB; // Akış yönü: Yukarıdan Aşağıya (Top to Bottom)
+    node [shape=box, style="filled", fillcolor="#ECEFF1"]; // Varsayılan düğüm stili
+    edge [fontname="Arial"]; // Kenar yazı tipi
+
+    // Şekil Tanımları (Akış Şeması Sembolleri)
+    start [shape=Mdiamond, fillcolor="#C8E6C9", label="BAŞLA\n(Ders_Kayit_Islemi)"];
+    end [shape=Mdiamond, fillcolor="#FFCDD2", label="BİTİR"];
+    
+    // İşlem Blokları
+    A1 [label="Öğrenci Bilgilerini Getir\n(Kayıt Durumu, Borç, Kredi Limiti)"];
+    A2 [shape=diamond, fillcolor="#FFF9C4", label="Kayıt Aktif mi VE\nBorcu Var mı?"];
+    A3 [shape=box, fillcolor="#FFCDD2", label="Hata: Kayıt aktif değil/Borçlu\nGERİ DÖN HATA"];
+    B1 [shape=parallelogram, fillcolor="#B3E5FC", label="Kullanıcıdan Yeni Ders Kodu Al\n(DÖNGÜ BAŞLANGICI)"];
+    B2 [shape=diamond, fillcolor="#FFF9C4", label="Ders Kodu 'BITIR' mı?"];
+    B3 [shape=box, fillcolor="#C8E6C9", label="Döngüyü Sonlandır\n(Kaydı Taslak Olarak Kaydet)"];
+
+    // Kontrol Alt Fonksiyonu
+    C1 [shape=box, fillcolor="#E1BEE7", label="Kontrol_Et_Ders_Ekleme() Fonksiyonunu Çağır\n(Önkoşul, Kontenjan, Çakışma, Kredi Kontrolleri)"];
+    C2 [shape=diamond, fillcolor="#FFF9C4", label="Kontrol Başarılı mı?"];
+    C3 [shape=box, fillcolor="#FFCDD2", label="Hata Mesajı Yayınla\n(Döngüye Devam Et)"];
+    C4 [shape=box, fillcolor="#C8E6C9", label="Dersi Ekle, Kontenjanı Azalt,\nKrediyi Güncelle"];
+    
+    // Sonlandırma İşlemleri
+    D1 [shape=box, fillcolor="#90CAF9", label="Veritabanına Taslak Kaydet"];
+    D2 [shape=box, fillcolor="#90CAF9", label="Danışman Onay Talebi Gönder"];
+
+    // AKIŞ
+    start -> A1;
+    A1 -> A2;
+    
+    // Başlangıç Kontrolü
+    A2 -> A3 [label="HAYIR"]; // Hata Durumu
+    A2 -> B1 [label="EVET"]; // Kayıt Başlayabilir
+    
+    // Ders Seçim Döngüsü
+    B1 -> B2;
+    B2 -> B3 [label="EVET"]; // Kaydı Bitir
+    B2 -> C1 [label="HAYIR"]; // Ders Kontrolüne Git
+    
+    // Ders Kontrol ve Ekleme
+    C1 -> C2;
+    C2 -> C4 [label="Başarılı (EVET)"];
+    C2 -> C3 [label="Başarısız (HAYIR)"];
+    
+    C3 -> B1 [label="Tekrar Seçim"]; // Hata sonrası döngüye geri dön
+    C4 -> B1 [label="Yeni Seçim"]; // Başarılı ekleme sonrası döngüye geri dön
+
+    // Kaydı Tamamlama
+    B3 -> D1;
+    D1 -> D2;
+    D2 -> end;
+}
