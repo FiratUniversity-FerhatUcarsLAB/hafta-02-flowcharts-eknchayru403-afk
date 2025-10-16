@@ -1,0 +1,63 @@
+digraph HastaneRandevuSistemi {
+    // Grafiğin genel ayarları
+    graph [
+        rankdir=LR; // Soldan Sağa düzen
+        label="Hastane Randevu Sistemi - Veritabanı İlişkileri";
+        labelloc=t;
+        fontname="Helvetica";
+        fontsize=16;
+    ];
+
+    // Düğüm (Tablo) Stilleri
+    node [
+        shape=record; // Tablo gibi görünmesi için record şekli
+        style="filled";
+        fillcolor="#F9F9F9";
+        fontname="Helvetica";
+    ];
+
+    // Varlıklar (Tablolar)
+
+    Hasta [
+        label = "{<id> Hasta | + Kimlik (PK)\n+ Ad\n+ Soyad\n+ Telefon\n+ Adres}"
+        fillcolor="#CCEEFF" // Açık Mavi
+    ];
+
+    Doktor [
+        label = "{<id> Doktor | + Kimlik (PK)\n+ Ad\n+ Soyad\n+ Branş\n+ Çalışma Durumu}"
+        fillcolor="#CCFFCC" // Açık Yeşil
+    ];
+
+    ÇalışmaPlanı [
+        label = "{<id> ÇalışmaPlanı | + PlanID (PK)\n+ <doktorid> DoktorID (FK)\n+ Tarih\n+ BaşlangıçSaati\n+ BitişSaati\n+ RandevuAralığı}"
+        fillcolor="#FFFFCC" // Açık Sarı
+    ];
+
+    Randevu [
+        label = "{<id> Randevu | + RandevuID (PK)\n+ <hastaid> HastaID (FK)\n+ <doktorid> DoktorID (FK)\n+ Tarih\n+ Saat\n+ Durum (Onaylandı, İptal Edildi)}"
+        fillcolor="#FFCCCC" // Açık Kırmızı
+    ];
+
+    // İlişkiler
+
+    // Randevu -> Hasta (Bir Hasta, birden çok Randevuya sahip olabilir)
+    Randevu:hastaid -> Hasta:id [
+        label = "N:1 (Sahibi)"
+        fontname="Helvetica-Oblique"
+        fontsize=10
+    ];
+
+    // Randevu -> Doktor (Bir Doktor, birden çok Randevuya sahip olabilir)
+    Randevu:doktorid -> Doktor:id [
+        label = "N:1 (Veren)"
+        fontname="Helvetica-Oblique"
+        fontsize=10
+    ];
+
+    // ÇalışmaPlanı -> Doktor (Bir Doktorun birden çok Çalışma Planı olabilir)
+    ÇalışmaPlanı:doktorid -> Doktor:id [
+        label = "N:1 (Aittir)"
+        fontname="Helvetica-Oblique"
+        fontsize=10
+    ];
+}
