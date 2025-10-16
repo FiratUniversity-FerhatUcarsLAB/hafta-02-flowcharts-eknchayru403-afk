@@ -1,7 +1,3 @@
 Hayrunnisa Ekinci
 240541043
-[pseudocode.md.md](https://github.com/user-attachments/files/22932780/pseudocode.md.md)
-[flowchart.dot.txt](https://github.com/user-attachments/files/22932845/flowchart.dot.txt)
-<img width="1673" height="835" alt="flowchart png" src="https://github.com/user-attachments/assets/93d03c4c-7f57-40cb-96c1-56a65d0d4faa" />
-[llm.conversations.txt](https://github.com/user-attachments/files/22941263/llm.conversations.txt)
-[README.md.txt](https://github.com/user-attachments/files/22941032/README.md.txt)
+Bu sohbet, temel bir online alışveriş sepeti algoritmasının geliştirilmesine odaklanmıştır. İlk olarak, sepete ürün ekleme, çıkarma ve toplam tutarı hesaplama gibi temel işlevleri kapsayan detaylı bir Pseudocode oluşturulmuştur. Ardından, bu algoritmanın mantıksal akışını, karar noktalarını ve işlem adımlarını görselleştirmek amacıyla Graphviz (DOT) dilinde eksiksiz bir akış şeması kodu yazılmıştır. Bu sayede, hem algoritmanın programlama mantığı hem de süreç haritası net bir şekilde ortaya konulmuştur.
