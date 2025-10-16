@@ -1,0 +1,64 @@
+digraph AkilliEvGuvenlikAlgoritmasi {
+    // Grafiğin genel ayarları
+    rankdir=LR;  // Soldan Sağa Akış
+    node [shape=box, style="filled", fontname="Helvetica"];
+
+    // Durumlar (States)
+    node [fillcolor="#ADD8E6"]; // Açık Mavi
+    DEVRE_DISI [label="DEVRE_DISI\n(Pasif)", fillcolor="#FFFFE0"]; // Açık Sarı (Başlangıç)
+    EVDE       [label="EVDE\n(Kısmen Aktif)"];
+    UZAKTA     [label="UZAKTA\n(Tam Aktif)"];
+    node [fillcolor="#FFB6C1", shape=doublecircle]; // Açık Kırmızı (Önemli Durum)
+    ALARM      [label="ALARM\nTETIKLENDI"];
+
+    // Başlangıç Noktası
+    START [shape=point];
+    START -> DEVRE_DISI;
+
+    // 1. DEVRE_DISI -> Aktif Modlar (Silahlandırma)
+    DEVRE_DISI -> EVDE   [label="SistemiSilahlandir(EVDE)"];
+    DEVRE_DISI -> UZAKTA [label="SistemiSilahlandir(UZAKTA)"];
+
+    // 2. Aktif Modlar -> DEVRE_DISI (Devre Dışı Bırakma)
+    EVDE   -> DEVRE_DISI [label="DevreDisiBirak(PIN)"];
+    UZAKTA -> DEVRE_DISI [label="DevreDisiBirak(PIN)"];
+    ALARM  -> DEVRE_DISI [label="DevreDisiBirak(PIN)"];
+
+    // 3. Sensör Kontrolü ve Alarm Tetiklemesi
+    subgraph cluster_kontrol {
+        label = "ANA DÖNGÜ: Sensör ve Kural Kontrolü";
+        style=rounded;
+        KURAL_KONTROL [label="Sensor Oku ve Kural Kontrolü", shape=record, fillcolor="#F0F8FF"];
+        
+        // Aktif modlardan kural kontrolüne geçiş (Sürekli Çalışma)
+        UZAKTA -> KURAL_KONTROL [style=dashed, label="1 Sn Bekle"];
+        EVDE -> KURAL_KONTROL [style=dashed, label="1 Sn Bekle"];
+    
+        // Kural Kontrolü sonucu Alarm Tetiklenebilir
+        KURAL_KONTROL -> ALARM [label="Kural İhlali", style=bold, color="red"];
+        
+        // Kural Kontrolü Alarm tetiklemezse mevcut durumuna döner (Kendine Döngü Temsili)
+        KURAL_KONTROL -> EVDE [label="İhlal Yok\n(Durum Korunur)"];
+        KURAL_KONTROL -> UZAKTA [label="İhlal Yok\n(Durum Korunur)"];
+    }
+
+    // 4. ALARM Durumu İçinde Akış
+    ALARM -> ALARM [label="Alarm Sesini Cal()\n+ Bildirim Gonder()", style="dashed", color="red"];
+
+    // 5. Acil Durum Kontrolü (Yangın)
+    subgraph cluster_acil {
+        label = "Alarm Anında Ek Kontrol";
+        style=rounded;
+        ACIL_KONTROL [shape=diamond, label="Duman Algılandı mı?"];
+        ALARM -> ACIL_KONTROL [label="Kontrol"];
+        ACIL_KONTROL -> ALARM [label="Hayır"];
+        ACIL_KONTROL -> YANGIN_PRO [label="Evet\n(Yangın Protokolü Başlat)"];
+    }
+    
+    YANGIN_PRO [label="YANGIN PROTOKOLÜ", fillcolor="#FF4500", shape=box3d];
+
+    // Ek: Kullanıcı Girişi (Tüm durumlar, giriş ile değişebilir)
+    DEVRE_DISI -> EVDE [label="KullanıcıSilahlandırma"];
+    EVDE -> UZAKTA [label="KullanıcıSilahlandırma"];
+    UZAKTA -> EVDE [label="KullanıcıSilahlandırma"];
+    // ... Bu geçişler zaten ilk tanımlarda var.
